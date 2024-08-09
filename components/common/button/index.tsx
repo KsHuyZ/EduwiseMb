@@ -1,11 +1,5 @@
-import {
-  ActivityIndicator,
-  Dimensions,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { commonStyles } from "@/styles/common/common.styles";
 
 interface ButtonProps {
   readonly title: string;
@@ -14,20 +8,9 @@ interface ButtonProps {
 }
 
 export default function Button({ title, onPress, loading }: ButtonProps) {
-  const { width } = Dimensions.get("window");
-
   return (
     <TouchableOpacity
-      style={[
-        commonStyles.buttonContainer,
-        {
-          width: width * 1 - 150,
-          height: 40,
-          alignItems: "center",
-          flexDirection: "row",
-          justifyContent: "center",
-        },
-      ]}
+      style={{ padding: 16, borderRadius: 8, backgroundColor: "#2467EC" }}
       onPress={onPress}
     >
       {loading ? (

@@ -1,13 +1,15 @@
 import { Toast } from "react-native-toast-notifications";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api";
-import { validateError } from "@/utils";
+import { setStorage, validateError } from "@/utils";
 import { TSignInCredentials } from "@/types";
 
 export const useSignIn = () => {
   return useMutation({
     mutationFn: (values: TSignInCredentials) => signIn(values),
-    onSuccess() {
+    async onSuccess(result) {
+      await setStorage("token", result.token);
+      await setStorage("user", result.userResponse);
       Toast.show("Sign in success", {
         type: "success",
       });

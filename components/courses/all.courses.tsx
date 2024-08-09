@@ -1,28 +1,13 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Dimensions,
-} from "react-native";
-import {
-  useFonts,
-  Raleway_700Bold,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
-import {
-  Nunito_600SemiBold,
-  Nunito_500Medium,
-} from "@expo-google-fonts/nunito";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
-import CourseCard from "@/components/cards/course.card";
+import CourseCard from "@/components/cards/course-card";
+import { CourseType } from "@/types";
 
 export default function AllCourses() {
-  const [courses, setCourses] = useState<CoursesType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState<CourseType[]>([]);
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -35,17 +20,6 @@ export default function AllCourses() {
         console.log(error);
       });
   }, []);
-
-  let [fontsLoaded, fontError] = useFonts({
-    Raleway_700Bold,
-    Nunito_600SemiBold,
-    Raleway_600SemiBold,
-    Nunito_500Medium,
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
 
   return (
     <View style={{ flex: 1, marginHorizontal: 16 }}>
@@ -81,7 +55,7 @@ export default function AllCourses() {
         ref={flatListRef}
         data={courses}
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item._id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => <CourseCard item={item} />}
       />
     </View>

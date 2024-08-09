@@ -13,19 +13,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import { router } from "expo-router";
-import CourseCard from "../cards/course.card";
+import CourseCard from "../cards/course-card";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+import { CourseType } from "@/types";
 
 export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
   const [value, setValue] = useState("");
-  const [courses, setcourses] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
 
   useEffect(() => {
     axios
       .get(`${SERVER_URI}/get-courses`)
       .then((res: any) => {
-        setcourses(res.data.courses);
+        setCourses(res.data.courses);
         if (!homeScreen) {
           setFilteredCourses(res.data.courses);
         }
@@ -39,7 +40,7 @@ export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
     if (homeScreen && value === "") {
       setFilteredCourses([]);
     } else if (value) {
-      const filtered = courses.filter((course: CoursesType) =>
+      const filtered = courses.filter((course: CourseType) =>
         course.name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredCourses(filtered);
@@ -56,7 +57,7 @@ export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
     return null;
   }
 
-  const renderCourseItem = ({ item }: { item: CoursesType }) => (
+  const renderCourseItem = ({ item }: { item: CourseType }) => (
     <TouchableOpacity
       style={{
         backgroundColor: "#fff",
@@ -73,7 +74,7 @@ export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
       }
     >
       <Image
-        source={{ uri: item?.thumbnail?.url }}
+        source={{ uri: item?.file?.url }}
         style={{ width: 60, height: 60, borderRadius: 10 }}
       />
       <Text
@@ -110,11 +111,11 @@ export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
       <View style={{ paddingHorizontal: 10 }}>
         <FlatList
           data={filteredCourses}
-          keyExtractor={(item: CoursesType) => item._id}
+          keyExtractor={(item: CourseType) => item.id}
           renderItem={
             homeScreen
               ? renderCourseItem
-              : ({ item }) => <CourseCard item={item} key={item._id} />
+              : ({ item }) => <CourseCard item={item} key={item.id} />
           }
         />
       </View>

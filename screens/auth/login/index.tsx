@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   SafeAreaView,
   Image,
 } from "react-native";
@@ -18,7 +17,8 @@ import Input from "@/components/common/input";
 import { useSignIn } from "./hooks";
 import { TSignInCredentials } from "@/types";
 import { signInSchema } from "@/validator";
-import { setStorage } from "@/utils";
+import Button from "@/components/common/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginScreen() {
   const { mutateAsync: signIn, isPending } = useSignIn();
@@ -30,11 +30,11 @@ export default function LoginScreen() {
   } = useForm<TSignInCredentials>({
     resolver: zodResolver(signInSchema),
   });
+  const { setUser } = useAuth();
 
   const onSubmit = async (values: TSignInCredentials) => {
     const result = await signIn(values);
-    await setStorage("token", result.token);
-    await setStorage("user", result.userResponse);
+    setUser(result.userResponse);
     router.push("/(tabs)");
   };
 
@@ -109,34 +109,13 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={{
-                padding: 16,
-                borderRadius: 8,
-                backgroundColor: "#2467EC",
-                marginTop: 15,
-              }}
+            <Button
+              loading={isPending}
               onPress={handleSubmit(onSubmit)}
-            >
-              {isPending ? (
-                <ActivityIndicator size="small" color={"white"} />
-              ) : (
-                <Text
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontFamily: "Raleway_700Bold",
-                  }}
-                >
-                  Sign In
-                </Text>
-              )}
-            </TouchableOpacity>
+              title="Sign In"
+            />
+
             <View style={styles.relative}>
-              {/* <View style={styles.lineAbsolute}>
-                  <View style={styles.line} />
-                </View> */}
               <View style={styles.relativeText}>
                 <Text style={{ backgroundColor: "transparent" }}>
                   Or continue with

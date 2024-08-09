@@ -8,8 +8,8 @@ import Axios from "axios";
 import { RefreshTokenResponse, Token } from "@/types";
 import { getStorage, setStorage } from "@/utils";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
+const API_URL = 'http://10.50.84.176:8080';
+console.log(API_URL);
 const refreshTokenApi = (refreshToken: string): Promise<RefreshTokenResponse> =>
   Axios.post(`${API_URL}/auth/refresh`, `Bearer ${refreshToken}`);
 

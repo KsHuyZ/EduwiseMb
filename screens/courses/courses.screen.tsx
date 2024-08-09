@@ -2,39 +2,18 @@ import { SERVER_URI } from "@/utils/uri";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import {
-  useFonts,
-  Raleway_700Bold,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
-import {
-  Nunito_400Regular,
-  Nunito_700Bold,
-  Nunito_500Medium,
-  Nunito_600SemiBold,
-} from "@expo-google-fonts/nunito";
 import Loader from "@/components/loader/loader";
 import { LinearGradient } from "expo-linear-gradient";
-import CourseCard from "@/components/cards/course.card";
+import CourseCard from "@/components/cards/course-card";
+import { CourseType } from "@/types";
+import React from "react";
 
 export default function CoursesScreen() {
-  const [courses, setCourses] = useState<CoursesType[]>([]);
-  const [originalCourses, setOriginalCourses] = useState<CoursesType[]>([]);
+  const [courses, setCourses] = useState<CourseType[]>([]);
+  const [originalCourses, setOriginalCourses] = useState<CourseType[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setcategories] = useState([]);
   const [activeCategory, setactiveCategory] = useState("All");
-
-  useEffect(() => {
-    axios
-      .get(`${SERVER_URI}/get-layout/Categories`)
-      .then((res) => {
-        setcategories(res.data.layout.categories);
-        fetchCourses();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   const fetchCourses = () => {
     axios
@@ -50,26 +29,13 @@ export default function CoursesScreen() {
       });
   };
 
-  let [fontsLoaded, fontError] = useFonts({
-    Raleway_700Bold,
-    Nunito_400Regular,
-    Nunito_700Bold,
-    Nunito_500Medium,
-    Nunito_600SemiBold,
-    Raleway_600SemiBold,
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
-
   const handleCategories = (e: string) => {
     setactiveCategory(e);
     if (e === "All") {
       setCourses(originalCourses);
     } else {
-      const filterCourses = originalCourses.filter(
-        (i: CoursesType) => i.categories === e
+      const filterCourses = originalCourses.filter((i: CourseType) =>
+        i.categories.some((category) => category.name.includes(e))
       );
       setCourses(filterCourses);
     }
@@ -126,7 +92,7 @@ export default function CoursesScreen() {
           </View>
           <View>
             <ScrollView style={{ marginHorizontal: 15, gap: 12 }}>
-              {courses?.map((item: CoursesType, index: number) => (
+              {courses?.map((item: CourseType, index: number) => (
                 <CourseCard item={item} key={index} />
               ))}
             </ScrollView>

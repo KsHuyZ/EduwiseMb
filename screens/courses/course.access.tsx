@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Loader from "@/components/loader/loader";
 import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
@@ -19,17 +19,14 @@ import { Toast } from "react-native-toast-notifications";
 import ReviewCard from "@/components/cards/review.card";
 import { FontAwesome } from "@expo/vector-icons";
 import useUser from "@/hooks/auth/useUser";
+import { CourseType, TUnit } from "@/types";
+import { useLessonList } from "./hooks";
 
 export default function CourseAccessScreen() {
-  const [isLoading, setisLoading] = useState(true);
-  const { user } = useUser();
-  const { courseData } = useLocalSearchParams();
-  const data: CoursesType = JSON.parse(courseData as string);
-
-  const [courseContentData, setcourseContentData] = useState<CourseDataType[]>(
-    []
-  );
-  const [activeVideo, setActiveVideo] = useState(0);
+  const { courseData, id } = useLocalSearchParams();
+  const { data, isLoading } = useLessonList(id as string);
+  const [currentLesson, setCurrentLesson] = useState<string[]>([]);
+  const [selectUnit, setSelectUnit] = useState<TUnit | undefined>(undefined);
   const [activeButton, setActiveButton] = useState("About");
   const [isExpanded, setIsExpanded] = useState(false);
   const [quesion, setQuesion] = useState("");
@@ -37,68 +34,22 @@ export default function CourseAccessScreen() {
   const [review, setReview] = useState("");
   const [reviewAvailabe, setreviewAvailabe] = useState(false);
 
-  useEffect(() => {
-    const subscription = async () => {
-      await fetchCourseContent();
-      const isReviewAvailble = data?.reviews?.find(
-        (i: any) => i.user._id === user?._id
-      );
-      if (isReviewAvailble) {
-        setreviewAvailabe(true);
-      }
-    };
-    subscription();
-  }, []);
-
-  const fetchCourseContent = async () => {
-    const accessToken = await AsyncStorage.getItem("access_token");
-    const refreshToken = await AsyncStorage.getItem("refresh_token");
-    await axios
-      .get(`${SERVER_URI}/get-course-content/${data._id}`, {
-        headers: {
-          "access-token": accessToken,
-          "refresh-token": refreshToken,
-        },
-      })
-      .then((res: any) => {
-        setisLoading(false);
-        setcourseContentData(res.data.content);
-      })
-      .catch((error) => {
-        setisLoading(false);
-        router.push("/(routes)/course-details");
-      });
-  };
+  // useEffect(() => {
+  //   const subscription = async () => {
+  //     await fetchCourseContent();
+  //     const isReviewAvailble = data?.reviews?.find(
+  //       (i: any) => i.user._id === user?._id
+  //     );
+  //     if (isReviewAvailble) {
+  //       setreviewAvailabe(true);
+  //     }
+  //   };
+  //   subscription();
+  // }, []);
 
   const handleQuestionSubmit = async () => {
     const accessToken = await AsyncStorage.getItem("access_token");
     const refreshToken = await AsyncStorage.getItem("refresh_token");
-
-    await axios
-      .put(
-        `${SERVER_URI}/add-question`,
-        {
-          question: quesion,
-          courseId: data?._id,
-          contentId: courseContentData[activeVideo]._id,
-        },
-        {
-          headers: {
-            "access-token": accessToken,
-            "refresh-token": refreshToken,
-          },
-        }
-      )
-      .then((res) => {
-        setQuesion("");
-        Toast.show("Question created successfully!", {
-          placement: "bottom",
-        });
-        fetchCourseContent();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const handleReviewSubmit = async () => {
@@ -107,7 +58,7 @@ export default function CourseAccessScreen() {
 
     await axios
       .put(
-        `${SERVER_URI}/add-review/${data?._id}`,
+        `${SERVER_URI}/add-review/${data?.[0]?.id}`,
         {
           review,
           rating,
@@ -159,7 +110,7 @@ export default function CourseAccessScreen() {
             style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: 10 }}
           >
             <WebView
-              source={{ uri: courseContentData[activeVideo]?.videoUrl! }}
+              source={{ uri: data?.[0]?.units[0].video?.url! }}
               allowsFullscreenVideo={true}
             />
           </View>
@@ -172,8 +123,8 @@ export default function CourseAccessScreen() {
           >
             <TouchableOpacity
               style={styles.button}
-              disabled={activeVideo === 0}
-              onPress={() => setActiveVideo(activeVideo - 1)}
+              // disabled={activeVideo === 0}
+              // onPress={() => setActiveVideo(activeVideo - 1)}
             >
               <Text style={{ color: "#fff", fontSize: 18, fontWeight: "600" }}>
                 Prev
@@ -181,7 +132,7 @@ export default function CourseAccessScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => setActiveVideo(activeVideo + 1)}
+              // onPress={() => setActiveVideo(activeVideo + 1)}
             >
               <Text style={{ color: "#fff", fontSize: 18, fontWeight: "600" }}>
                 Next
@@ -190,7 +141,8 @@ export default function CourseAccessScreen() {
           </View>
           <View style={{ paddingVertical: 10 }}>
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-              {activeVideo + 1}. {courseContentData[activeVideo]?.title}
+              {/* {activeVideo + 1}. {courseContentData[activeVideo]?.title} */}
+              2. Hêheh
             </Text>
           </View>
           <View
@@ -262,7 +214,7 @@ export default function CourseAccessScreen() {
             </TouchableOpacity>
           </View>
 
-          {activeButton === "About" && (
+          {/* {activeButton === "About" && (
             <View
               style={{
                 marginHorizontal: 16,
@@ -303,7 +255,7 @@ export default function CourseAccessScreen() {
                 </TouchableOpacity>
               )}
             </View>
-          )}
+          )} */}
           {activeButton === "Q&A" && (
             <View style={{ flex: 1, margin: 15 }}>
               <View>
@@ -340,7 +292,7 @@ export default function CourseAccessScreen() {
                 </View>
               </View>
               <View style={{ marginBottom: 20 }}>
-                {courseContentData[activeVideo]?.questions
+                {/* {courseContentData[activeVideo]?.questions
                   ?.slice()
                   .reverse()
                   .map((item: CommentType, index: number) => (
@@ -351,7 +303,7 @@ export default function CourseAccessScreen() {
                       courseData={data}
                       contentId={courseContentData[activeVideo]._id}
                     />
-                  ))}
+                  ))} */}
               </View>
             </View>
           )}
@@ -410,9 +362,9 @@ export default function CourseAccessScreen() {
                 </View>
               )}
               <View style={{ rowGap: 25 }}>
-                {data?.reviews?.map((item: ReviewType, index: number) => (
+                {/* {data?.reviews?.map((item: ReviewType, index: number) => (
                   <ReviewCard item={item} key={index} />
-                ))}
+                ))} */}
               </View>
             </View>
           )}

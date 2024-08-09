@@ -1,4 +1,4 @@
-import CartScreen from "@/screens/cart/cart.screen";
+import CartScreen from "@/screens/cart";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import React from "react";
 

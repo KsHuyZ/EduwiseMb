@@ -1,9 +1,19 @@
-import useUser from "@/hooks/auth/useUser";
-import { Tabs } from "expo-router";
-import { Image } from "react-native";
+import React from "react";
+import { Redirect, Tabs } from "expo-router";
+import { Image, Text } from "react-native";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TabsLayout() {
-  const { user } = useUser();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (!user) {
+    return <Redirect href="/(routes)/login" />;
+  }
+
   return (
     <Tabs
       screenOptions={({ route }) => {

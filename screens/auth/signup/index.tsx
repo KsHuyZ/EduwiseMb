@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
@@ -16,10 +15,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { router } from "expo-router";
 import Input from "@/components/common/input";
-import styles from "./styles";
 import { TSignUpCredentials } from "@/types";
 import { signUpSchema } from "@/validator";
+import Button from "@/components/common/button";
 import { useSignUp } from "./hooks";
+import styles from "./styles";
 
 export default function SignUpScreen() {
   const {
@@ -34,7 +34,7 @@ export default function SignUpScreen() {
 
   const onSubmit = async (values: TSignUpCredentials) => {
     await signUp(values);
-    setTimeout(() => Linking.openURL(`googlegmail://`), 1000);
+    // setTimeout(() => Linking.openURL(`googlegmail://`), 1000);
   };
 
   return (
@@ -129,31 +129,11 @@ export default function SignUpScreen() {
                 )}
               />
               <View>
-                <TouchableOpacity
-                  style={{
-                    padding: 16,
-                    borderRadius: 8,
-                    backgroundColor: "#2467EC",
-                    marginTop: 15,
-                  }}
+                <Button
+                  title="Sign Up"
                   onPress={handleSubmit(onSubmit)}
-                >
-                  {isPending ? (
-                    <ActivityIndicator size="small" color={"white"} />
-                  ) : (
-                    <Text
-                      style={{
-                        color: "white",
-                        textAlign: "center",
-                        fontSize: 16,
-                        fontFamily: "Raleway_700Bold",
-                      }}
-                    >
-                      Sign Up
-                    </Text>
-                  )}
-                </TouchableOpacity>
-
+                  loading={isPending}
+                />
                 <View style={styles.signupRedirect}>
                   <Text
                     style={{ fontSize: 18, fontFamily: "Raleway_600SemiBold" }}

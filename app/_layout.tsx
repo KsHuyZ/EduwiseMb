@@ -18,6 +18,7 @@ import {
   Nunito_700Bold,
   Nunito_600SemiBold,
 } from "@expo-google-fonts/nunito";
+import { useAuth } from "@/hooks/useAuth";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -71,6 +72,7 @@ function RootLayoutNav() {
       },
     },
   });
+
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
@@ -80,14 +82,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(routes)/login/index" />
           <Stack.Screen name="(routes)/sign-up/index" />
           <Stack.Screen name="(routes)/forgot-password/index" />
-          <Stack.Screen
-            name="(routes)/course-details/index"
-            options={{
-              headerShown: true,
-              title: "Course Details",
-              headerBackTitle: "Back",
-            }}
-          />
+          <Stack.Screen name="(routes)/course-details/index" />
           <Stack.Screen
             name="(routes)/cart/index"
             options={{
